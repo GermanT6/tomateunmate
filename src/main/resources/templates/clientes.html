@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomate un Mate - Clientes</title>
+    <link href="css/header.css" rel="stylesheet">
+    <script src="/js/header.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <style>
+        /* Estilos personalizados */
+        html, body {
+            height: 100%; /* Asegura que el body ocupe toda la altura de la ventana */
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body {
+            background-color: white;
+            color: #6e3826;
+        }
+
+        header {
+            background-color: #6e3826;
+            color: white;
+        }
+
+        .navbar-brand img {
+            height: 50px;
+        }
+
+        .btn-primary {
+            background-color: #6e3826;
+            border-color: #6e3826;
+        }
+
+        .btn-primary:hover {
+            background-color: #5a2e1e;
+            border-color: #5a2e1e;
+        }
+
+        .table thead {
+            background-color: #6e3826;
+            color: white;
+        }
+
+        main {
+            flex-grow: 1; /* Hace que el main ocupe el espacio restante */
+            padding: 20px 0;
+        }
+
+        footer {
+            background-color: #6e3826;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con Navbar de Bootstrap -->
+    <header class="p-3">
+        <div class="container">
+            <div class="d-flex flex-column align-items-center text-center">
+                <a href="#" class="navbar-brand mb-3">
+                    <img src="/media/logo.jpeg" alt="Logo Tomate un Mate" class="img-fluid" style="height: 100px; width: 100px;">
+                </a>
+                <nav>
+                    <ul class="nav">
+                        <li class="nav-item"><a href="/index" class="nav-link text-white">Inicio</a></li>
+                        <li class="nav-item"><a href="/productos" class="nav-link text-white">Productos</a></li>
+                        <li class="nav-item"><a href="/ventas" class="nav-link text-white">Ventas</a></li>
+                        <li class="nav-item"><a href="/compras" class="nav-link text-white">Compras</a></li>
+                        <li class="nav-item"><a href="/clientes" class="nav-link text-white">Clientes</a></li>
+                        <li class="nav-item"><a href="/proveedores" class="nav-link text-white">Proveedores</a></li>
+                        <!-- Aquí agregamos el ícono de cerrar sesión -->
+                        <li class="nav-item">
+                            <form th:action="@{/logout}" method="post" class="d-inline">
+                                <button type="submit" class="nav-link text-white bg-transparent border-0">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="container my-5">
+        <section id="clientes" class="mb-5">
+            <h2 class="mb-4">Clientes</h2>
+
+            <div class="table-responsive"> 
+                <table id="tabla-clientes" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="cliente : ${clientes}">
+                            <td th:text="${cliente.id}"></td>
+                            <td th:text="${cliente.nombre}"></td>
+                            <td th:text="${cliente.descripcion}"></td>
+                            <td>
+                                <!-- Botón para editar - Versión corregida -->
+                                <button class="btn btn-sm" 
+                                style="background-color: #6e3826; color: white;" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modal-cliente"
+                                        th:data-id="${cliente.id}"
+                                        th:data-nombre="${cliente.nombre}"
+                                        th:data-descripcion="${cliente.descripcion}"
+                                        onclick="cargarDatosParaEditar(this)">
+                                        <i class="bi bi-pencil"></i> 
+                                </button>
+                                <a th:href="@{/eliminar-cliente/{id}(id=${cliente.id})}" 
+                                class="btn btn-secondary btn-sm">
+                                <i class="bi bi-trash3-fill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modal-cliente"
+            onclick="limpiarFormulario()">  <!-- Cambiado th:onclick por onclick -->
+            Agregar cliente
+    </button>
+        </div>
+    </main>
+
+     <!-- Modal para agregar/editar cliente -->
+     <div class="modal fade" id="modal-cliente" tabindex="-1" aria-labelledby="modal-cliente-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-cliente-label">Agregar Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-cliente" th:action="@{/guardar-cliente}" method="post">
+                        <!-- Campo oculto para el ID (IMPORTANTE) -->
+                        <input type="hidden" id="clienteId" name="id">
+                        
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre:</label>
+                            <input type="text" id="nombre" name="nombre" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción:</label>
+                            <textarea id="descripcion" name="descripcion" class="form-control"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Aceptar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 Tomate un Mate. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS y dependencias -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <!-- Scripts personalizados -->
+    <script src="static/js/clientes.js"></script>
+
+    <script>
+        function cargarDatosParaEditar(button) {
+            const id = button.getAttribute('data-id');
+            const nombre = button.getAttribute('data-nombre');
+            const descripcion = button.getAttribute('data-descripcion');
+            
+            document.getElementById('clienteId').value = id;
+            document.getElementById('nombre').value = nombre;
+            document.getElementById('descripcion').value = descripcion;
+            
+            // Cambiar el título del modal
+            document.getElementById('modal-cliente-label').textContent = 'Editar Cliente';
+        }
+        
+        function limpiarFormulario() {
+            document.getElementById('form-cliente').reset();
+            document.getElementById('clienteId').value = '';
+            document.getElementById('modal-cliente-label').textContent = 'Agregar Cliente';
+        }
+    </script>
+</body>
+</html>

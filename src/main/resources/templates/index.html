@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomate un Mate - Dashboard</title>
+    <link href="css/header.css" rel="stylesheet">
+    <script src="/js/header.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Agregar Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body {
+            background-color: white;
+            color: #6e3826;
+        }
+
+        header {
+            background-color: #6e3826;
+            color: white;
+        }
+
+        .navbar-brand img {
+            height: 50px;
+        }
+
+        .btn-primary {
+            background-color: #6e3826;
+            border-color: #6e3826;
+        }
+
+        .btn-primary:hover {
+            background-color: #5a2e1e;
+            border-color: #5a2e1e;
+        }
+
+        .table thead {
+            background-color: #6e3826;
+            color: white;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px 0;
+        }
+
+        footer {
+            background-color: #6e3826;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    
+
+    <header class="p-3">      
+        <div class="container">
+            <div class="d-flex flex-column align-items-center text-center">
+                <a href="#" class="navbar-brand mb-3">
+                    <img src="/media/logo.jpeg" alt="Logo Tomate un Mate" class="img-fluid" style="height: 100px; width: 100px;">
+                </a>
+                <nav>
+                    <ul class="nav">
+                        <li class="nav-item"><a href="/index" class="nav-link text-white">Inicio</a></li>
+                        <li class="nav-item"><a href="/productos" class="nav-link text-white">Productos</a></li>
+                        <li class="nav-item"><a href="/ventas" class="nav-link text-white">Ventas</a></li>
+                        <li class="nav-item"><a href="/compras" class="nav-link text-white">Compras</a></li>
+                        <li class="nav-item"><a href="/clientes" class="nav-link text-white">Clientes</a></li>
+                        <li class="nav-item"><a href="/proveedores" class="nav-link text-white">Proveedores</a></li>
+                        <!-- Aquí agregamos el ícono de cerrar sesión -->
+                        <li class="nav-item">
+                            <form th:action="@{/logout}" method="post" class="d-inline">
+                                <button type="submit" class="nav-link text-white bg-transparent border-0">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+            
+    <div class="container d-flex justify-content-between align-items-center my-4">
+        <span class="text-muted small">Bienvenido: <span th:text="${#authentication.name}"></span></span>
+    </div>
+
+    <main class="container my-5">
+        <h2 class="text-center mb-4">Análisis de Datos</h2>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h4>Total Ventas</h4>
+                    <p class="fs-3">$<span th:text="${totalVenta}"></span></p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h4>Total Gastos</h4>
+                    <p class="fs-3">$<span th:text="${totalCompra}"></span></p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h4>Balance Neto</h4>
+                    <p class="fs-3">$<span th:text="${balanceNeto}"></span></p>
+                </div>
+            </div>
+            
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h4 class="text-center">Ventas Mensuales</h4>
+                <canvas id="chart-ventas"></canvas>
+            </div>
+            <div class="col-md-6">
+                <h4 class="text-center">Gastos Mensuales</h4>
+                <canvas id="chart-gastos"></canvas>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h4 class="text-center">Ventas por Categoría</h4>
+                <canvas id="chart-categorias"></canvas>
+            </div>
+            <div class="col-md-6">
+                <h4 class="text-center">Ingresos vs. Gastos</h4>
+                <canvas id="chart-balance"></canvas>
+            </div>
+        </div>
+    </main>
+    <footer class="mt-5 text-center p-3">
+        <p class="mb-0">&copy; 2025 Tomate un Mate. Todos los derechos reservados.</p>
+    </footer>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script th:inline="javascript">
+        var totalVenta = /*[[${totalVenta}]]*/ 0;
+        var totalCompra = /*[[${totalCompra}]]*/ 0;
+    
+        new Chart(document.getElementById('chart-ventas'), {
+            type: 'bar',
+            data: {
+                labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+                datasets: [{
+                    label: 'Ventas en $',
+                    data: [2200, 2500, 2800, 3100, 3300, 3500],
+                    backgroundColor: '#6e3826'
+                }]
+            }
+        });
+    
+        new Chart(document.getElementById('chart-gastos'), {
+            type: 'line',
+            data: {
+                labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+                datasets: [{
+                    label: 'Gastos en $',
+                    data: [1800, 2100, 2300, 2700, 2900, 3100],
+                    borderColor: '#6e3826',
+                    fill: false
+                }]
+            }
+        });
+    
+        new Chart(document.getElementById('chart-categorias'), {
+            type: 'pie',
+            data: {
+                labels: ['Mates', 'Yerba', 'Termos', 'Accesorios'],
+                datasets: [{
+                    label: 'Ventas por Categoría',
+                    data: [4000, 3200, 2800, 2400],
+                    backgroundColor: ['#8B5A2B', '#D2691E', '#A0522D', '#CD853F']
+                }]
+            }
+        });
+    
+        new Chart(document.getElementById('chart-balance'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Ingresos', 'Gastos'],
+                datasets: [{
+                    label: 'Ingresos vs Gastos',
+                    data: [totalVenta, totalCompra],
+                    backgroundColor: ['#6e3826', '#CD853F']
+                }]
+            }
+        });
+    </script>
+
+
+    
+</body>
+</html>

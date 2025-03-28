@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomate un Mate - Productos</title>
+    <link href="css/header.css" rel="stylesheet">
+    <script src="/js/header.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body {
+            background-color: white;
+            color: #6e3826;
+        }
+
+        header {
+            background-color: #6e3826;
+            color: white;
+        }
+
+        .navbar-brand img {
+            height: 50px;
+        }
+
+        .btn-primary {
+            background-color: #6e3826;
+            border-color: #6e3826;
+        }
+
+        .btn-primary:hover {
+            background-color: #5a2e1e;
+            border-color: #5a2e1e;
+        }
+
+        .table thead {
+            background-color: #6e3826;
+            color: white;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px 0;
+        }
+
+        footer {
+            background-color: #6e3826;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        .precio-venta {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #6e3826 !important;
+            text-align: center;
+            padding: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+
+        .precio-venta .bi {
+            margin-right: 4px;
+            color: #6e3826  ; /* Verde un poco más oscuro para el ícono */
+        }
+
+        .valor-total-stock {
+            border-left: 4px solid #6e3826 !important;
+            margin-bottom: 1rem;
+        }
+
+        .valor-total-stock h5 {
+            color: #6e3826 !important;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .toast {
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateX(100%);
+            margin-bottom: 10px;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+    </style>
+</head>
+<body>
+    <header class="p-3">
+        <div class="container">
+            <div class="d-flex flex-column align-items-center text-center">
+                <a href="#" class="navbar-brand mb-3">
+                    <img src="/media/logo.jpeg" alt="Logo Tomate un Mate" class="img-fluid" style="height: 100px; width: 100px;">
+                </a>
+                <nav>
+                    <ul class="nav">
+                        <li class="nav-item"><a href="/index" class="nav-link text-white">Inicio</a></li>
+                        <li class="nav-item"><a href="/productos" class="nav-link text-white">Productos</a></li>
+                        <li class="nav-item"><a href="/ventas" class="nav-link text-white">Ventas</a></li>
+                        <li class="nav-item"><a href="/compras" class="nav-link text-white">Compras</a></li>
+                        <li class="nav-item"><a href="/clientes" class="nav-link text-white">Clientes</a></li>
+                        <li class="nav-item"><a href="/proveedores" class="nav-link text-white">Proveedores</a></li>
+                        <!-- Aquí agregamos el ícono de cerrar sesión -->
+                        <li class="nav-item">
+                            <form th:action="@{/logout}" method="post" class="d-inline">
+                                <button type="submit" class="nav-link text-white bg-transparent border-0">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-5">
+        <!-- Notificaciones flotantes -->
+        <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
+            <!-- Notificación de éxito -->
+            <div th:if="${success}" class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+                <div class="toast-header bg-success text-white">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong class="me-auto">Éxito</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <span th:text="${success}"></span>
+                </div>
+            </div>
+            
+            <!-- Notificación de error -->
+            <div th:if="${error}" class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+                <div class="toast-header bg-danger text-white">
+                    <i class="bi bi-exclamation-triangle-fill me-2" style="color: #ff6b6b"></i>
+                    <strong class="me-auto">Error</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body" style="background-color: #f8f9fa; border-left: 4px solid #ff6b6b">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle me-2" style="color: #ff6b6b; font-size: 1.2rem"></i>
+                        <span th:text="${error}" class="text-dark"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section id="productos" class="mb-5">
+            <h2 class="mb-4">Productos</h2>
+            
+            <!-- Añade este campo de búsqueda -->
+            <div class="mb-3">
+                <form th:action="@{/productos}" method="get" class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" name="filtro" class="form-control" 
+                               placeholder="Buscar productos..." th:value="${param.filtro}">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                        <a th:href="@{/productos}" class="btn btn-secondary">Limpiar</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive"> 
+                <table id="tabla-productos" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Precio Compra</th>
+                            <th>Precio Venta</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="producto : ${productos}">
+                            <td th:text="${producto.id}"></td>
+                            <td th:text="${producto.nombre}"></td>
+                            <td th:text="${producto.descripcion}"></td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(producto.precioCompra, 1, 2)}"></td>
+                            <td class="precio-venta fw-bold fs-5 text-success">
+                                <i class="bi bi-currency-dollar"></i>
+                                <span th:text="${#numbers.formatDecimal(producto.precioVenta, 1, 2)}"></span>
+                            </td>
+                            <td th:text="${producto.stock}"></td>
+                            <td>
+                                <!-- Botón para editar - Versión corregida -->
+                                <button class="btn btn-sm" 
+                                style="background-color: #6e3826; color: white;"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modal-producto"
+                                        th:data-id="${producto.id}"
+                                        th:data-nombre="${producto.nombre}"
+                                        th:data-descripcion="${producto.descripcion}"
+                                        th:data-preciocompra="${producto.precioCompra}"
+                                        th:data-precioventa="${producto.precioVenta}"
+                                        th:data-stock="${producto.stock}"
+                                        onclick="cargarDatosParaEditar(this)">
+                                        <i class="bi bi-pencil"></i>
+                                </button>
+                                
+                                <!-- Botón para eliminar -->
+                                <a th:href="@{/eliminar-producto/{id}(id=${producto.id})}" 
+                                class="btn btn-secondary btn-sm"
+                                onclick="return confirm('¿Estás seguro de eliminar este producto?')">
+                                <i class="bi bi-trash3-fill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modal-producto"
+                    th:onclick="limpiarFormulario()">
+                Agregar Producto
+            </button>
+        </div>
+        <!-- Sección para mostrar el valor total del stock VENTA -->
+        <div class="valor-total-stock bg-light p-2 rounded d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Total venta según stock:</h5>
+            <span class="badge bg-success fs-6" th:text="'$' + ${#numbers.formatDecimal(totalStockVenta, 1, 2)}"></span>
+        </div>
+
+        <!-- Sección para mostrar el valor total del stock COMPRA -->
+        <div class="valor-total-stock bg-light p-2 rounded d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Total compra según stock:</h5>
+            <span class="badge bg-primary fs-6" th:text="'$' + ${#numbers.formatDecimal(totalStockCompra, 1, 2)}"></span>
+        </div>
+                   
+    </main>
+
+    
+    
+    <!-- Modal para agregar/editar producto -->
+    <div class="modal fade" id="modal-producto" tabindex="-1" aria-labelledby="modal-producto-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-producto-label">Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-producto" th:action="@{/guardar-producto}" method="post">
+                        <input type="hidden" id="productoId" name="id">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre:</label>
+                            <input type="text" id="nombre" name="nombre" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción:</label>
+                            <textarea id="descripcion" name="descripcion" class="form-control"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="precioCompra" class="form-label">Precio Compra:</label>
+                            <input type="number" id="precioCompra" name="precioCompra" class="form-control" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="precioVenta" class="form-label">Precio Venta:</label>
+                            <input type="number" id="precioVenta" name="precioVenta" class="form-control" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="stock" class="form-label">Stock:</label>
+                            <input type="number" id="stock" name="stock" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 Tomate un Mate. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS y dependencias -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <!-- Scripts personalizados -->
+    <script src="static/js/productos.js"></script>
+
+    <script>
+        function cargarDatosParaEditar(button) {
+            const id = button.getAttribute('data-id');
+            const nombre = button.getAttribute('data-nombre');
+            const descripcion = button.getAttribute('data-descripcion');
+            const precioCompra = button.getAttribute('data-preciocompra');
+            const precioVenta = button.getAttribute('data-precioventa');
+            const stock = button.getAttribute('data-stock');
+            
+            document.getElementById('productoId').value = id;
+            document.getElementById('nombre').value = nombre;
+            document.getElementById('descripcion').value = descripcion;
+            document.getElementById('precioCompra').value = precioCompra;
+            document.getElementById('precioVenta').value = precioVenta;
+            document.getElementById('stock').value = stock;
+            
+            // Cambiar el título del modal
+            document.getElementById('modal-producto-label').textContent = 'Editar Producto';
+        }
+        
+        function limpiarFormulario() {
+            document.getElementById('form-producto').reset();
+            document.getElementById('productoId').value = '';
+            document.getElementById('modal-producto-label').textContent = 'Agregar Producto';
+        }
+    </script>  
+    <script>
+        // Inicializar toasts de Bootstrap
+        document.addEventListener('DOMContentLoaded', function() {
+            const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            const toastList = toastElList.map(function(toastEl) {
+                const toast = new bootstrap.Toast(toastEl, {
+                    autohide: true,
+                    delay: 2000
+                });
+                toast.show();
+                return toast;
+            });
+            
+            // Opcional: Animación de entrada
+            const toastElements = document.querySelectorAll('.toast');
+            toastElements.forEach(toast => {
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    toast.style.opacity = '1';
+                    toast.style.transform = 'translateX(0)';
+                }, 100);
+            });
+        });
+        </script>
+</body>
+</html>
