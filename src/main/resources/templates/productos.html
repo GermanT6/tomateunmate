@@ -9,6 +9,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" href="/media/logo.ico" type="image/x-icon">
     <!-- Estilos personalizados -->
     <style>
         html, body {
@@ -197,10 +198,10 @@
                             <td th:text="${producto.id}"></td>
                             <td th:text="${producto.nombre}"></td>
                             <td th:text="${producto.descripcion}"></td>
-                            <td th:text="'$' + ${#numbers.formatDecimal(producto.precioCompra, 1, 2)}"></td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(producto.precioCompra, 1, 'POINT', 2, 'COMMA')}"></td>
                             <td class="precio-venta fw-bold fs-5 text-success">
                                 <i class="bi bi-currency-dollar"></i>
-                                <span th:text="${#numbers.formatDecimal(producto.precioVenta, 1, 2)}"></span>
+                                <span th:text="${#numbers.formatDecimal(producto.precioVenta, 1, 'POINT', 2, 'COMMA')}"></span>
                             </td>
                             <td th:text="${producto.stock}"></td>
                             <td>
@@ -240,14 +241,20 @@
         </div>
         <!-- Sección para mostrar el valor total del stock VENTA -->
         <div class="valor-total-stock bg-light p-2 rounded d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Total venta según stock:</h5>
-            <span class="badge bg-success fs-6" th:text="'$' + ${#numbers.formatDecimal(totalStockVenta, 1, 2)}"></span>
+            <h5 class="mb-0">Total VENTA según stock:</h5>
+            <span class="badge bg-success fs-6" th:text="'$' + ${#numbers.formatDecimal(totalStockVenta, 1,'POINT', 2, 'COMMA')}"></span>
         </div>
 
         <!-- Sección para mostrar el valor total del stock COMPRA -->
         <div class="valor-total-stock bg-light p-2 rounded d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Total compra según stock:</h5>
-            <span class="badge bg-primary fs-6" th:text="'$' + ${#numbers.formatDecimal(totalStockCompra, 1, 2)}"></span>
+            <h5 class="mb-0">Total COMPRA según stock:</h5>
+            <span class="badge bg-primary fs-6" th:text="'$' + ${#numbers.formatDecimal(totalStockCompra, 1,'POINT', 2, 'COMMA')}"></span>
+        </div>
+
+        <!-- Sección para mostrar el valor total del stock COMPRA -->
+        <div class="valor-total-stock bg-light p-2 rounded d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Total GANANCIA según stock:</h5>
+            <span class="badge bg-warning fs-6" th:text="'$' + ${#numbers.formatDecimal(totalStockVenta - totalStockCompra , 1,'POINT', 2, 'COMMA')}"></span>
         </div>
                    
     </main>
@@ -302,57 +309,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <!-- Scripts personalizados -->
-    <script src="static/js/productos.js"></script>
-
-    <script>
-        function cargarDatosParaEditar(button) {
-            const id = button.getAttribute('data-id');
-            const nombre = button.getAttribute('data-nombre');
-            const descripcion = button.getAttribute('data-descripcion');
-            const precioCompra = button.getAttribute('data-preciocompra');
-            const precioVenta = button.getAttribute('data-precioventa');
-            const stock = button.getAttribute('data-stock');
-            
-            document.getElementById('productoId').value = id;
-            document.getElementById('nombre').value = nombre;
-            document.getElementById('descripcion').value = descripcion;
-            document.getElementById('precioCompra').value = precioCompra;
-            document.getElementById('precioVenta').value = precioVenta;
-            document.getElementById('stock').value = stock;
-            
-            // Cambiar el título del modal
-            document.getElementById('modal-producto-label').textContent = 'Editar Producto';
-        }
-        
-        function limpiarFormulario() {
-            document.getElementById('form-producto').reset();
-            document.getElementById('productoId').value = '';
-            document.getElementById('modal-producto-label').textContent = 'Agregar Producto';
-        }
-    </script>  
-    <script>
-        // Inicializar toasts de Bootstrap
-        document.addEventListener('DOMContentLoaded', function() {
-            const toastElList = [].slice.call(document.querySelectorAll('.toast'));
-            const toastList = toastElList.map(function(toastEl) {
-                const toast = new bootstrap.Toast(toastEl, {
-                    autohide: true,
-                    delay: 2000
-                });
-                toast.show();
-                return toast;
-            });
-            
-            // Opcional: Animación de entrada
-            const toastElements = document.querySelectorAll('.toast');
-            toastElements.forEach(toast => {
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => {
-                    toast.style.opacity = '1';
-                    toast.style.transform = 'translateX(0)';
-                }, 100);
-            });
-        });
-        </script>
+    <script src="/js/productos.js"></script>
 </body>
 </html>

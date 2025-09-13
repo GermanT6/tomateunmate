@@ -31,7 +31,8 @@ public class ProductoController {
             productos = productoService.obtenerTodos();
         }
 
-        productos.sort((a, b) -> a.getId().compareTo(b.getId()));
+        // Ordenar alfabéticamente por nombre
+        productos.sort((a, b) -> a.getNombre().compareToIgnoreCase(b.getNombre()));
 
         double totalStockVenta = productos.stream()
             .mapToDouble(p -> p.getPrecioVenta() * p.getStock())
